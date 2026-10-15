@@ -33,6 +33,13 @@ class GoatcounterVisit(models.Model):
 
     _session_uniq = models.Constraint('unique(session)', "One visit per session.")
 
+    @api.depends('start', 'country_id', 'location')
+    def _compute_display_name(self):
+        for visit in self:
+            when = fields.Datetime.context_timestamp(visit, visit.start).strftime('%Y-%m-%d %H:%M') \
+                if visit.start else ''
+            visit.display_name = f"{visit.country_id.name or visit.location or '?'} · {when}"
+
     @api.depends('pageview_ids.path', 'pageview_ids.is_event', 'pageview_ids.datetime')
     def _compute_summary(self):
         for visit in self:

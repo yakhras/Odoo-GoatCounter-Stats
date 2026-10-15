@@ -16,7 +16,7 @@ class ResConfigSettings(models.TransientModel):
         "GoatCounter site code", config_parameter='goatcounter_stats.site_code',
         help="The <code> of https://<code>.goatcounter.com")
     goatcounter_key_found = fields.Boolean("API key found", compute='_compute_goatcounter_status')
-    goatcounter_last_sync = fields.Char("Last sync", compute='_compute_goatcounter_status')
+    goatcounter_last_sync = fields.Datetime("Last sync", compute='_compute_goatcounter_status')
     goatcounter_last_result = fields.Char("Last result", compute='_compute_goatcounter_status')
     goatcounter_visit_result = fields.Char("Visits import", compute='_compute_goatcounter_status')
     goatcounter_backfill_from = fields.Date("Backfill from", default=date(2026, 10, 15))
@@ -26,7 +26,7 @@ class ResConfigSettings(models.TransientModel):
         params = self.env['ir.config_parameter'].sudo()
         for settings in self:
             settings.goatcounter_key_found = bool(os.environ.get(TOKEN_ENV))
-            settings.goatcounter_last_sync = params.get_param('goatcounter_stats.last_sync') or '-'
+            settings.goatcounter_last_sync = params.get_param('goatcounter_stats.last_sync') or False
             settings.goatcounter_last_result = params.get_param('goatcounter_stats.last_result') or '-'
             settings.goatcounter_visit_result = params.get_param('goatcounter_stats.visit_result') or '-'
 
