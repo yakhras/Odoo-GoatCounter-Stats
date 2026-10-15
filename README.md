@@ -63,6 +63,24 @@ Days are grouped in the timezone of your GoatCounter account, the same as on the
 | **Website Stats → Sources** | countries, referrers, browsers, systems, screen sizes per day |
 | **Website Stats → Settings** | site code, key status, last sync results, **Sync now**, **Backfill** |
 
+The screenshots below use **generated demo data**, not real visitors.
+
+**Dashboard:** choose the period (1). The cards (2) compare each number with the previous period of the same length. **Latest visits** (3) shows the path of each recent visit; click one to open it. Every card and row opens the matching records. A country row opens the visits from that country.
+
+![Dashboard](goatcounter_stats/docs/dashboard.png)
+
+**Visitor journeys:** one row per visit, with its country (1) and the pages and clicks it went through, in order (2). Clicks are marked with ★.
+
+![Visitor journeys](goatcounter_stats/docs/journeys.png)
+
+**One visit:** where it came from and when (1), and the timeline of what this visitor saw and clicked (2). Clicks are highlighted.
+
+![One visit](goatcounter_stats/docs/journey_form.png)
+
+**Settings:** the site code and whether the API key was found in the environment (1). The sync results, Sync now and Backfill (2).
+
+![Settings](goatcounter_stats/docs/settings.png)
+
 Totals are updated every hour. GoatCounter allows **one export per hour**, so a visit shows up in Visitor journeys within about an hour. "Waiting" in **Visits import** means the module will retry next hour; it is not an error.
 
 ## Tests
