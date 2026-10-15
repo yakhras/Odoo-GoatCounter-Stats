@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_goatcounter_total_system,goatcounter.total system,model_goatcounter_total,base.group_system,1,1,1,1
+access_goatcounter_hit_system,goatcounter.hit system,model_goatcounter_hit,base.group_system,1,1,1,1
+access_goatcounter_dimension_system,goatcounter.dimension system,model_goatcounter_dimension,base.group_system,1,1,1,1
+access_goatcounter_visit_system,goatcounter.visit system,model_goatcounter_visit,base.group_system,1,1,1,1
+access_goatcounter_pageview_system,goatcounter.pageview system,model_goatcounter_pageview,base.group_system,1,1,1,1

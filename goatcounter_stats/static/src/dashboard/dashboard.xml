@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="goatcounter_stats.Delta">
+        <t t-set="pct" t-value="delta(current, previous)"/>
+        <span t-if="pct !== null" class="small ms-2"
+              t-att-class="pct >= 0 ? 'text-success' : 'text-danger'"
+              t-attf-title="Previous period: {{ previous }}">
+            <i t-att-class="pct >= 0 ? 'fa fa-caret-up' : 'fa fa-caret-down'"/>
+            <t t-esc="Math.abs(pct)"/>%
+        </span>
+    </t>
+
+    <t t-name="goatcounter_stats.Dashboard">
+        <div class="o_goatcounter_dashboard o_action h-100 overflow-auto bg-view">
+            <div class="container-fluid py-3 px-4">
+
+                <!-- Header: title, period, sync -->
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                    <h2 class="mb-0 me-auto">Website Stats</h2>
+                    <div class="btn-group" role="group">
+                        <t t-foreach="periods" t-as="period" t-key="period.days">
+                            <button type="button" class="btn btn-sm"
+                                    t-att-class="state.days === period.days ? 'btn-primary' : 'btn-secondary'"
+                                    t-on-click="() => this.setPeriod(period.days)" t-esc="period.label"/>
+                        </t>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-secondary" t-on-click="syncNow"
+                            t-att-disabled="state.syncing">
+                        <i class="fa fa-refresh me-1" t-att-class="{'fa-spin': state.syncing}"/>Sync now
+                    </button>
+                </div>
+
+                <t t-set="data" t-value="state.data"/>
+                <div class="text-muted small mb-3">
+                    <t t-esc="data.date_from"/> → <t t-esc="data.date_to"/>
+                    (<t t-esc="data.span"/> days, compared with the <t t-esc="data.span"/> days before)
+                    · Last sync: <t t-esc="data.last_sync or 'never'"/>
+                    <span t-if="!data.key_found" class="text-danger ms-2">
+                        <i class="fa fa-warning"/> GOAT_COUNTER_KEY is not set in the Odoo environment.
+                    </span>
+                    <span t-elif="data.last_result.startsWith('Error')" class="text-danger ms-2"
+                          t-esc="data.last_result"/>
+                </div>
+
+                <!-- KPI cards -->
+                <div class="row g-3 mb-3">
+                    <div class="col-6 col-lg-3">
+                        <div class="card h-100 o_gc_kpi" t-on-click="() => this.openPages()">
+                            <div class="card-body">
+                                <div class="text-muted small">Page views</div>
+                                <div class="fs-2 fw-bold">
+                                    <t t-esc="data.kpis.pageviews"/>
+                                    <t t-call="goatcounter_stats.Delta">
+                                        <t t-set="current" t-value="data.kpis.pageviews"/>
+                                        <t t-set="previous" t-value="data.kpis.pageviews_prev"/>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-3">
+                        <div class="card h-100 o_gc_kpi" t-on-click="() => this.openClicks()">
+                            <div class="card-body">
+                                <div class="text-muted small">Clicks</div>
+                                <div class="fs-2 fw-bold">
+                                    <t t-esc="data.kpis.clicks"/>
+                                    <t t-call="goatcounter_stats.Delta">
+                                        <t t-set="current" t-value="data.kpis.clicks"/>
+                                        <t t-set="previous" t-value="data.kpis.clicks_prev"/>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-3">
+                        <div class="card h-100 o_gc_kpi" t-on-click="() => this.openPages()">
+                            <div class="card-body">
+                                <div class="text-muted small">Pages visited</div>
+                                <div class="fs-2 fw-bold" t-esc="data.kpis.pages"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-3">
+                        <div class="card h-100 o_gc_kpi" t-on-click="() => this.openSource('locations')">
+                            <div class="card-body">
+                                <div class="text-muted small">Countries</div>
+                                <div class="fs-2 fw-bold" t-esc="data.kpis.countries"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trend -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Page views and clicks per day</h5>
+                        <div class="o_gc_chart"><canvas t-ref="chart"/></div>
+                    </div>
+                </div>
+
+                <!-- Latest visits: what each visitor saw and clicked -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex align-items-baseline">
+                            <h5 class="card-title o_gc_link me-auto" t-on-click="() => this.openVisits()">
+                                Latest visits <span class="text-muted small fw-normal">(<t t-esc="data.visit_count"/> in this period)</span>
+                            </h5>
+                            <span t-if="data.visit_result.startsWith('Error')" class="text-danger small"
+                                  t-esc="data.visit_result"/>
+                        </div>
+                        <div t-if="!data.latest_visits.length" class="text-muted small">
+                            No visits imported yet. <t t-esc="data.visit_result"/>
+                        </div>
+                        <div t-foreach="data.latest_visits" t-as="visit" t-key="visit.id"
+                             class="o_gc_row d-flex gap-3 small" t-on-click="() => this.openVisit(visit.id)">
+                            <span class="text-nowrap text-muted" t-esc="visit.start"/>
+                            <span class="text-nowrap fw-bold" t-esc="visit.country or '?'"/>
+                            <span class="text-nowrap text-muted d-none d-md-inline" t-esc="visit.browser"/>
+                            <span class="text-truncate" t-esc="visit.journey" t-att-title="visit.journey"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top pages + clicks -->
+                <div class="row g-3 mb-3">
+                    <div class="col-lg-7">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Top pages</h5>
+                                <t t-call="goatcounter_stats.BarList">
+                                    <t t-set="rows" t-value="data.top_pages"/>
+                                    <t t-set="onRow" t-value="(row) => this.openPages(row.name)"/>
+                                    <t t-set="showTitle" t-value="true"/>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-5">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Clicks</h5>
+                                <t t-call="goatcounter_stats.BarList">
+                                    <t t-set="rows" t-value="data.clicks"/>
+                                    <t t-set="onRow" t-value="(row) => this.openClicks(row.name)"/>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sources -->
+                <div class="row g-3">
+                    <t t-foreach="sourceOrder" t-as="kind" t-key="kind">
+                        <t t-set="source" t-value="data.sources[kind]"/>
+                        <div class="col-md-6 col-xl-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title o_gc_link" t-on-click="() => this.openSource(kind)"
+                                        t-esc="source.label"/>
+                                    <t t-call="goatcounter_stats.BarList">
+                                        <t t-set="rows" t-value="source.rows"/>
+                                        <t t-set="total" t-value="source.total"/>
+                                        <t t-set="onRow" t-value="(row) => this.openSource(kind, row.name)"/>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <!-- Ranked rows with a proportional bar. Inputs: rows, onRow, optional total, showTitle. -->
+    <t t-name="goatcounter_stats.BarList">
+        <div t-if="!rows.length" class="text-muted small">No data for this period.</div>
+        <div t-foreach="rows" t-as="row" t-key="row.name" class="o_gc_row" t-on-click="() => onRow(row)">
+            <div class="d-flex justify-content-between small">
+                <span class="text-truncate me-2" t-att-title="row.title or row.name">
+                    <t t-esc="row.name"/>
+                    <span t-if="showTitle and row.title" class="text-muted ms-1" t-esc="row.title"/>
+                </span>
+                <span class="text-nowrap fw-bold">
+                    <t t-esc="row.count"/>
+                    <span t-if="total" class="text-muted fw-normal ms-1">(<t t-esc="percent(row.count, total)"/>%)</span>
+                </span>
+            </div>
+            <div class="o_gc_bar"><div class="o_gc_bar_fill" t-att-style="barWidth(row.count, rows)"/></div>
+        </div>
+    </t>
+
+</templates>

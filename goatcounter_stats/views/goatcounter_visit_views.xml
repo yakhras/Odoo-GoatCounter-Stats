@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="goatcounter_visit_view_list" model="ir.ui.view">
+        <field name="name">goatcounter.visit.list</field>
+        <field name="model">goatcounter.visit</field>
+        <field name="arch" type="xml">
+            <list create="0" edit="0" delete="0">
+                <field name="start" string="Time"/>
+                <field name="country_id"/>
+                <field name="location" optional="hide"/>
+                <field name="browser" optional="show"/>
+                <field name="system" optional="show"/>
+                <field name="screen_size" optional="hide"/>
+                <field name="referrer" optional="show"/>
+                <field name="pageview_count" sum="Pages"/>
+                <field name="click_count" sum="Clicks"/>
+                <field name="journey"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="goatcounter_visit_view_form" model="ir.ui.view">
+        <field name="name">goatcounter.visit.form</field>
+        <field name="model">goatcounter.visit</field>
+        <field name="arch" type="xml">
+            <form create="0" edit="0" delete="0">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="country_id" readonly="1" placeholder="Unknown country"/>
+                        </h1>
+                        <div class="text-muted">
+                            <field name="start" readonly="1"/> → <field name="end" readonly="1"/>
+                        </div>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="browser"/>
+                            <field name="system"/>
+                            <field name="screen_size"/>
+                        </group>
+                        <group>
+                            <field name="referrer"/>
+                            <field name="first_visit"/>
+                            <field name="pageview_count"/>
+                            <field name="click_count"/>
+                        </group>
+                    </group>
+                    <separator string="What this visitor saw and clicked, in order"/>
+                    <field name="pageview_ids" readonly="1">
+                        <list decoration-warning="is_event" decoration-bf="is_event">
+                            <field name="datetime"/>
+                            <field name="is_event" widget="boolean_toggle" readonly="1" optional="hide"/>
+                            <field name="path"/>
+                            <field name="title"/>
+                        </list>
+                    </field>
+                    <field name="session" groups="base.group_no_one" readonly="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="goatcounter_visit_view_search" model="ir.ui.view">
+        <field name="name">goatcounter.visit.search</field>
+        <field name="model">goatcounter.visit</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="country_id"/>
+                <field name="pageview_ids" string="Page or click" filter_domain="[('pageview_ids.path', 'ilike', self)]"/>
+                <field name="referrer"/>
+                <field name="browser"/>
+                <filter name="with_clicks" string="With clicks" domain="[('click_count', '>', 0)]"/>
+                <filter name="first_visit" string="First visit" domain="[('first_visit', '=', True)]"/>
+                <separator/>
+                <filter name="filter_start" string="Date" date="start"/>
+                <group>
+                    <filter name="group_country" string="Country" context="{'group_by': 'country_id'}"/>
+                    <filter name="group_browser" string="Browser" context="{'group_by': 'browser'}"/>
+                    <filter name="group_day" string="Day" context="{'group_by': 'start:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="goatcounter_visit_action" model="ir.actions.act_window">
+        <field name="name">Visitor journeys</field>
+        <field name="res_model">goatcounter.visit</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No visits imported yet</p>
+            <p>Visits come from GoatCounter's export, once an hour (the API key needs the Export permission).</p>
+        </field>
+    </record>
+</odoo>

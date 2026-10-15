@@ -1,0 +1,41 @@
+// Copyright 2026 Yaser Akhras
+// License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
+
+.o_goatcounter_dashboard {
+    .o_gc_kpi,
+    .o_gc_row,
+    .o_gc_link {
+        cursor: pointer;
+    }
+
+    .o_gc_kpi:hover {
+        border-color: #2E7D6B;
+    }
+
+    .o_gc_chart {
+        position: relative;
+        height: 280px;
+    }
+
+    .o_gc_row {
+        padding: 0.3rem 0.25rem;
+        border-radius: 0.25rem;
+
+        &:hover {
+            background-color: rgba(46, 125, 107, 0.08);
+        }
+    }
+
+    .o_gc_bar {
+        height: 6px;
+        margin-top: 0.2rem;
+        border-radius: 3px;
+        background-color: rgba(46, 125, 107, 0.15);
+    }
+
+    .o_gc_bar_fill {
+        height: 100%;
+        border-radius: 3px;
+        background-color: #2E7D6B;
+    }
+}

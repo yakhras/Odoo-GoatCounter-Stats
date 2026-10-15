@@ -1,0 +1,7 @@
+2Path,Title,Event,UserAgent,Browser,System,Session,Bot,Referrer,Referrer scheme,Screen size,Location,FirstVisit,Date
+/,Yaser Akhras,false,Mozilla/5.0,Chrome 141,Windows 11,sess-brazil,0,,o,"1920,1080,1",BR-SP,true,2026-10-15T12:02:10Z
+/erp,ERP | Yaser Akhras,false,Mozilla/5.0,Chrome 141,Windows 11,sess-brazil,0,,o,"1920,1080,1",BR-SP,false,2026-10-15T12:03:01Z
+sector-erp,,true,Mozilla/5.0,Chrome 141,Windows 11,sess-brazil,0,,o,"1920,1080,1",BR-SP,false,2026-10-15T12:02:59Z
+/erp/stock_valuation,Stock Valuation | Yaser Akhras,false,Mozilla/5.0,Chrome 141,Windows 11,sess-brazil,0,,o,"1920,1080,1",BR-SP,false,2026-10-15T12:04:30Z
+/about,About | Yaser Akhras,false,Mozilla/5.0,Firefox 140,Linux,sess-turkey,0,linkedin.com,h,"1366,768,1",TR,true,2026-10-15T13:10:00Z
+/,Yaser Akhras,false,Googlebot,Chrome,Linux,sess-bot,1,,,,US,true,2026-10-15T13:11:00Z
