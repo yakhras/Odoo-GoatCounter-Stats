@@ -268,7 +268,11 @@ class GoatcounterSync(models.AbstractModel):
         export_id = params.get_param('goatcounter_stats.export_id')
         if not export_id:
             last_hit = int(params.get_param('goatcounter_stats.last_hit_id') or 0)
-            body = {'start_from_hit_id': last_hit + 1} if last_hit else {}
+            # The API rejects a missing format, despite documenting csv as the default.
+            # start_from_hit_id exports hits with an ID *greater than* it: pass the last imported one.
+            body = {'format': 'csv'}
+            if last_hit:
+                body['start_from_hit_id'] = last_hit
             response = self._request('POST', 'export', body=body)
             if response.status_code == 429:
                 return self.env._("Waiting: GoatCounter allows one export per hour.")

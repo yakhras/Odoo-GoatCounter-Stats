@@ -90,7 +90,7 @@ class TestGoatcounterVisits(TransactionCase):
 
     def test_incremental_import(self):
         self.run_import()
-        self.assertEqual(self.posted, [{}])  # first export: everything
+        self.assertEqual(self.posted, [{'format': 'csv'}])  # first export: everything
         self.assertEqual(self.params.get_param('goatcounter_stats.last_hit_id'), '1234')
         self.assertFalse(self.params.get_param('goatcounter_stats.export_id'))
 
@@ -98,7 +98,8 @@ class TestGoatcounterVisits(TransactionCase):
             '/linux,Linux,false,UA,Chrome 141,Windows 11,sess-brazil,0,,o,"1920,1080,1",BR-SP,false,2026-10-15T12:06:00Z\n'
         ok, result = self.run_import(export=EXPORT + later.split('\n', 1)[1].encode())
         self.assertTrue(ok, result)
-        self.assertEqual(self.posted[-1], {'start_from_hit_id': 1235})
+        # "only export hits with an ID greater than this": the last imported ID, not +1
+        self.assertEqual(self.posted[-1], {'format': 'csv', 'start_from_hit_id': 1234})
         self.assertEqual(result, 'OK: 0 new visits, 1 new page views/clicks.')  # re-sent rows not duplicated
         brazil = self.Visit.search([('session', '=', 'sess-brazil')])
         self.assertTrue(brazil.journey.endswith('→ /linux'))

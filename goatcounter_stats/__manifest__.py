@@ -8,7 +8,7 @@
     'maintainers': ["yakhras"],
     'website': "https://yaserakhras.com",
     'category': "Website",
-    'version': '19.0.1.2.1',
+    'version': '19.0.1.2.2',
     'application': True,
     'license': 'AGPL-3',
     'depends': ['base_setup'],
