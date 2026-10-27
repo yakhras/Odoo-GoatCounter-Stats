@@ -42,7 +42,7 @@ class TestGoatcounterSync(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.env['ir.config_parameter'].sudo().set_param('goatcounter_stats.site_code', 'yaserakhras')
+        cls.env['ir.config_parameter'].sudo().set_str('goatcounter_stats.site_code', 'yaserakhras')
         cls.sync = cls.env['goatcounter.sync']
         cls.Total = cls.env['goatcounter.total']
         cls.Hit = cls.env['goatcounter.hit']
@@ -61,7 +61,7 @@ class TestGoatcounterSync(TransactionCase):
         return ok, get
 
     def last_result(self):
-        return self.env['ir.config_parameter'].sudo().get_param('goatcounter_stats.last_result')
+        return self.env['ir.config_parameter'].sudo().get_str('goatcounter_stats.last_result')
 
     def test_sync_stores_recorded_day(self):
         ok, get = self.run_sync()
@@ -149,7 +149,7 @@ class TestGoatcounterSync(TransactionCase):
         with patch(f'{SYNC}.requests.get', side_effect=down), patch(f'{SYNC}.requests.post', side_effect=down):
             self.sync._cron_sync()
         self.assertIn('network down', self.last_result())
-        visit_result = self.env['ir.config_parameter'].sudo().get_param('goatcounter_stats.visit_result')
+        visit_result = self.env['ir.config_parameter'].sudo().get_str('goatcounter_stats.visit_result')
         self.assertIn('network down', visit_result)
 
     def test_stats_are_admin_only(self):

@@ -1,0 +1,6 @@
+id,name,model_id,group_id/id,operation,domain
+access_goatcounter_total_system,goatcounter.total system,goatcounter.total,base.group_system,crud,
+access_goatcounter_hit_system,goatcounter.hit system,goatcounter.hit,base.group_system,crud,
+access_goatcounter_dimension_system,goatcounter.dimension system,goatcounter.dimension,base.group_system,crud,
+access_goatcounter_visit_system,goatcounter.visit system,goatcounter.visit,base.group_system,crud,
+access_goatcounter_pageview_system,goatcounter.pageview system,goatcounter.pageview,base.group_system,crud,

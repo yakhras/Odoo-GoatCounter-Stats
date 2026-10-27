@@ -41,7 +41,7 @@ class GoatcounterSync(models.AbstractModel):
     # ------------------------------------------------------------------ API
 
     def _base_url(self):
-        code = self.env['ir.config_parameter'].sudo().get_param('goatcounter_stats.site_code')
+        code = self.env['ir.config_parameter'].sudo().get_str('goatcounter_stats.site_code')
         if not code:
             raise UserError(self.env._("Set the GoatCounter site code in Settings first."))
         return f"https://{code.strip()}.goatcounter.com/api/v0"
@@ -174,8 +174,8 @@ class GoatcounterSync(models.AbstractModel):
             _logger.warning("GoatCounter sync failed: %s", error)
             result = self.env._("Error: %s", error.args[0] if error.args else error)
             ok = False
-        params.set_param('goatcounter_stats.last_sync', fields.Datetime.to_string(fields.Datetime.now()))
-        params.set_param('goatcounter_stats.last_result', result)
+        params.set_str('goatcounter_stats.last_sync', fields.Datetime.to_string(fields.Datetime.now()))
+        params.set_str('goatcounter_stats.last_result', result)
         return ok
 
     # ------------------------------------------------------------------ visits (CSV export)
@@ -265,9 +265,9 @@ class GoatcounterSync(models.AbstractModel):
 
     def _sync_visits(self):
         params = self.env['ir.config_parameter'].sudo()
-        export_id = params.get_param('goatcounter_stats.export_id')
+        export_id = params.get_str('goatcounter_stats.export_id')
         if not export_id:
-            last_hit = int(params.get_param('goatcounter_stats.last_hit_id') or 0)
+            last_hit = int(params.get_str('goatcounter_stats.last_hit_id') or 0)
             # The API rejects a missing format, despite documenting csv as the default.
             # start_from_hit_id exports hits with an ID *greater than* it: pass the last imported one.
             body = {'format': 'csv'}
@@ -280,15 +280,15 @@ class GoatcounterSync(models.AbstractModel):
                 raise UserError(self.env._("Export returned HTTP %(status)s: %(detail)s",
                                            status=response.status_code, detail=response.text[:200]))
             export_id = str(response.json()['id'])
-            params.set_param('goatcounter_stats.export_id', export_id)
+            params.set_str('goatcounter_stats.export_id', export_id)
         text = self._download_export(export_id)
         if text is None:
             return self.env._("Waiting: export %s is still running, it will be imported next hour.", export_id)
         visits, steps = self._import_export_rows(self._parse_export(text))
         last_hit = self._get(f'export/{export_id}').get('last_hit_id')
         if last_hit:
-            params.set_param('goatcounter_stats.last_hit_id', str(last_hit))
-        params.set_param('goatcounter_stats.export_id', False)
+            params.set_str('goatcounter_stats.last_hit_id', str(last_hit))
+        params.set_str('goatcounter_stats.export_id', False)
         return self.env._("OK: %(visits)s new visits, %(steps)s new page views/clicks.",
                           visits=visits, steps=steps)
 
@@ -305,8 +305,8 @@ class GoatcounterSync(models.AbstractModel):
             ok = False
             # Start a fresh export next time (from the unchanged last_hit_id) instead of
             # retrying a broken one forever.
-            params.set_param('goatcounter_stats.export_id', False)
-        params.set_param('goatcounter_stats.visit_result', result)
+            params.set_str('goatcounter_stats.export_id', False)
+        params.set_str('goatcounter_stats.visit_result', result)
         return ok
 
     def _today(self):

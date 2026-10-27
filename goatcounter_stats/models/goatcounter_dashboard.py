@@ -76,11 +76,11 @@ class GoatcounterDashboard(models.AbstractModel):
         } for v in visits]
 
         params = self.env['ir.config_parameter'].sudo()
-        last_sync = fields.Datetime.to_datetime(params.get_param('goatcounter_stats.last_sync') or None)
+        last_sync = fields.Datetime.to_datetime(params.get_str('goatcounter_stats.last_sync') or None)
         return {
             'latest_visits': latest_visits,
             'visit_count': self.env['goatcounter.visit'].search_count([('start', '>=', moment_from)]),
-            'visit_result': params.get_param('goatcounter_stats.visit_result') or '',
+            'visit_result': params.get_str('goatcounter_stats.visit_result') or '',
             'date_from': fields.Date.to_string(date_from),
             'date_to': fields.Date.to_string(date_to),
             'span': span,
@@ -100,7 +100,7 @@ class GoatcounterDashboard(models.AbstractModel):
             'sources': sources,
             'last_sync': fields.Datetime.context_timestamp(self, last_sync).strftime('%Y-%m-%d %H:%M')
                          if last_sync else '',
-            'last_result': params.get_param('goatcounter_stats.last_result') or '',
+            'last_result': params.get_str('goatcounter_stats.last_result') or '',
             'key_found': bool(os.environ.get(TOKEN_ENV)),
         }
 

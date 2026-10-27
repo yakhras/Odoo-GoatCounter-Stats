@@ -26,9 +26,9 @@ class ResConfigSettings(models.TransientModel):
         params = self.env['ir.config_parameter'].sudo()
         for settings in self:
             settings.goatcounter_key_found = bool(os.environ.get(TOKEN_ENV))
-            settings.goatcounter_last_sync = params.get_param('goatcounter_stats.last_sync') or False
-            settings.goatcounter_last_result = params.get_param('goatcounter_stats.last_result') or '-'
-            settings.goatcounter_visit_result = params.get_param('goatcounter_stats.visit_result') or '-'
+            settings.goatcounter_last_sync = params.get_str('goatcounter_stats.last_sync') or False
+            settings.goatcounter_last_result = params.get_str('goatcounter_stats.last_result') or '-'
+            settings.goatcounter_visit_result = params.get_str('goatcounter_stats.visit_result') or '-'
 
     def action_goatcounter_sync_now(self):
         """Same as the hourly cron: today and yesterday."""

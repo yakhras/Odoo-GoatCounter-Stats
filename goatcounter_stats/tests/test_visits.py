@@ -34,9 +34,9 @@ class TestGoatcounterVisits(TransactionCase):
         super().setUpClass()
         cls.env['goatcounter.visit'].search([]).unlink()
         cls.params = cls.env['ir.config_parameter'].sudo()
-        cls.params.set_param('goatcounter_stats.site_code', 'yaserakhras')
-        cls.params.set_param('goatcounter_stats.last_hit_id', False)
-        cls.params.set_param('goatcounter_stats.export_id', False)
+        cls.params.set_str('goatcounter_stats.site_code', 'yaserakhras')
+        cls.params.set_str('goatcounter_stats.last_hit_id', False)
+        cls.params.set_str('goatcounter_stats.export_id', False)
         cls.sync = cls.env['goatcounter.sync']
         cls.Visit = cls.env['goatcounter.visit']
 
@@ -66,7 +66,7 @@ class TestGoatcounterVisits(TransactionCase):
         post, get = self.api(**kwargs)
         with post, get:
             ok = self.sync.run_visit_sync()
-        return ok, self.params.get_param('goatcounter_stats.visit_result')
+        return ok, self.params.get_str('goatcounter_stats.visit_result')
 
     def test_visit_journey_from_brazil(self):
         ok, result = self.run_import()
@@ -91,8 +91,8 @@ class TestGoatcounterVisits(TransactionCase):
     def test_incremental_import(self):
         self.run_import()
         self.assertEqual(self.posted, [{'format': 'csv'}])  # first export: everything
-        self.assertEqual(self.params.get_param('goatcounter_stats.last_hit_id'), '1234')
-        self.assertFalse(self.params.get_param('goatcounter_stats.export_id'))
+        self.assertEqual(self.params.get_str('goatcounter_stats.last_hit_id'), '1234')
+        self.assertFalse(self.params.get_str('goatcounter_stats.export_id'))
 
         later = EXPORT.decode().splitlines()[0] + '\n' + \
             '/linux,Linux,false,UA,Chrome 141,Windows 11,sess-brazil,0,,o,"1920,1080,1",BR-SP,false,2026-10-15T12:06:00Z\n'
@@ -114,7 +114,7 @@ class TestGoatcounterVisits(TransactionCase):
         ok, result = self.run_import(download_status=202)
         self.assertTrue(ok)
         self.assertTrue(result.startswith('Waiting'), result)
-        self.assertEqual(self.params.get_param('goatcounter_stats.export_id'), '77')
+        self.assertEqual(self.params.get_str('goatcounter_stats.export_id'), '77')
         ok, result = self.run_import()  # next hour: same export is downloaded, no new POST
         self.assertEqual(len(self.posted), 1)
         self.assertTrue(result.startswith('OK'), result)
@@ -123,4 +123,4 @@ class TestGoatcounterVisits(TransactionCase):
         ok, result = self.run_import(post_status=403)
         self.assertFalse(ok)
         self.assertIn('HTTP 403', result)
-        self.assertFalse(self.params.get_param('goatcounter_stats.export_id'))
+        self.assertFalse(self.params.get_str('goatcounter_stats.export_id'))
