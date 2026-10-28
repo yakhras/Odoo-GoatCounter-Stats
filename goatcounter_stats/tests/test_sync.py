@@ -158,4 +158,4 @@ class TestGoatcounterSync(TransactionCase):
             with self.assertRaises(AccessError):
                 self.env[model].with_user(user).search([])
         menu = self.env.ref('goatcounter_stats.menu_goatcounter_root')
-        self.assertEqual(menu.group_ids, self.env.ref('base.group_system'))
+        self.assertEqual(menu.groups_id, self.env.ref('base.group_system'))

@@ -31,7 +31,7 @@ class GoatcounterVisit(models.Model):
     journey = fields.Char(compute='_compute_summary', store=True,
                           help="Pages and clicks in order; clicks are marked with ★.")
 
-    _session_uniq = models.Constraint('unique(session)', "One visit per session.")
+    _sql_constraints = [('session_uniq', 'unique(session)', "One visit per session.")]
 
     @api.depends('start', 'country_id', 'location')
     def _compute_display_name(self):
@@ -62,4 +62,4 @@ class GoatcounterPageview(models.Model):
     is_event = fields.Boolean("Click")
     country_id = fields.Many2one(related='visit_id.country_id', store=True)
 
-    _step_uniq = models.Constraint('unique(visit_id, datetime, path, is_event)', "Duplicate page view.")
+    _sql_constraints = [('step_uniq', 'unique(visit_id, datetime, path, is_event)', "Duplicate page view.")]

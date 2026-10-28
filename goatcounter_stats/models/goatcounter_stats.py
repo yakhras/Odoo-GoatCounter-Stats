@@ -21,7 +21,7 @@ class GoatcounterTotal(models.Model):
     date = fields.Date(required=True, index=True)
     count = fields.Integer("Visits")
 
-    _date_uniq = models.Constraint('unique(date)', "One total per day.")
+    _sql_constraints = [('date_uniq', 'unique(date)', "One total per day.")]
 
 
 class GoatcounterHit(models.Model):
@@ -37,7 +37,7 @@ class GoatcounterHit(models.Model):
     is_event = fields.Boolean("Click event", index=True)
     count = fields.Integer("Count")
 
-    _date_path_uniq = models.Constraint('unique(date, path, is_event)', "One row per page per day.")
+    _sql_constraints = [('date_path_uniq', 'unique(date, path, is_event)', "One row per page per day.")]
 
 
 class GoatcounterDimension(models.Model):
@@ -50,4 +50,4 @@ class GoatcounterDimension(models.Model):
     name = fields.Char(required=True)
     count = fields.Integer("Visits")
 
-    _date_kind_name_uniq = models.Constraint('unique(date, kind, name)', "One row per value per day.")
+    _sql_constraints = [('date_kind_name_uniq', 'unique(date, kind, name)', "One row per value per day.")]

@@ -1,6 +1,6 @@
 # GoatCounter Website Stats
 
-[![tests](https://github.com/yakhras/Odoo-GoatCounter-Stats/actions/workflows/tests.yml/badge.svg)](https://github.com/yakhras/Odoo-GoatCounter-Stats/actions/workflows/tests.yml)
+[![tests](https://github.com/yakhras/Odoo-GoatCounter-Stats/actions/workflows/tests.yml/badge.svg?branch=18.0)](https://github.com/yakhras/Odoo-GoatCounter-Stats/actions/workflows/tests.yml)
 
 An Odoo module that pulls your website's [GoatCounter](https://www.goatcounter.com) statistics into Odoo through the GoatCounter API. You read visits, pages, clicks, traffic sources and each visitor's path through the site next to the rest of your work, instead of on goatcounter.com.
 
@@ -24,15 +24,15 @@ An Odoo module that pulls your website's [GoatCounter](https://www.goatcounter.c
 What it can't show: names, emails or IP addresses. GoatCounter doesn't collect them. A visit is one browser session, not a person, and visitors with ad blockers aren't counted.
 
 ## Requirements
-- Odoo 19.0 (Community or Enterprise). It depends only on `base_setup`.
+- Odoo 18.0 (Community or Enterprise). It depends only on `base_setup`.
 - The Python package `requests`, which comes with Odoo.
 - A GoatCounter site and an API key with the **Read statistics** and **Export** permissions. Export is needed for visitor journeys.
 - Outgoing HTTPS from the Odoo server to `<code>.goatcounter.com`.
 
 ## Installation
-1. Clone the repository on the `19.0` branch next to your other addons:
+1. Clone the repository on the `18.0` branch next to your other addons:
    ```
-   git clone -b 19.0 https://github.com/yakhras/Odoo-GoatCounter-Stats.git
+   git clone -b 18.0 https://github.com/yakhras/Odoo-GoatCounter-Stats.git
    ```
 2. Add the clone's folder to `addons_path` and restart Odoo.
 3. Apps → update the apps list → install **GoatCounter Website Stats**.
