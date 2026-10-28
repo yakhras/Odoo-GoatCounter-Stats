@@ -1,6 +1,6 @@
 # GoatCounter Website Stats
 
-[![tests](https://github.com/yakhras/Odoo-GoatCounter-Stats/actions/workflows/tests.yml/badge.svg)](https://github.com/yakhras/Odoo-GoatCounter-Stats/actions/workflows/tests.yml)
+[![tests](https://github.com/yakhras/Odoo-GoatCounter-Stats/actions/workflows/tests.yml/badge.svg?branch=19.0)](https://github.com/yakhras/Odoo-GoatCounter-Stats/actions/workflows/tests.yml)
 
 An Odoo module that pulls your website's [GoatCounter](https://www.goatcounter.com) statistics into Odoo through the GoatCounter API. You read visits, pages, clicks, traffic sources and each visitor's path through the site next to the rest of your work, instead of on goatcounter.com.
 

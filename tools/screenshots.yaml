@@ -1,0 +1,78 @@
+# Screenshot spec for C:\Odoo\scripts\odoo_shots.py (syntax in that file's docstring).
+# Captions live on the site page (front matter `screens`), not here.
+module: goatcounter_stats
+viewport: [1440, 900]
+shots:
+  - name: dashboard
+    open: /odoo/action-goatcounter_stats.goatcounter_dashboard_action
+    wait: .o_goatcounter_dashboard canvas
+    height: 2050          # the dashboard scrolls inside Odoo, not the window
+    steps:                # switch periods once, so the reload and chart redraw are exercised
+      - click: ".o_goatcounter_dashboard .btn-group button:has-text('7 days')"
+      - click: ".o_goatcounter_dashboard .btn-group button:has-text('30 days')"
+      - wait: .o_goatcounter_dashboard canvas
+    marks: [.o_goatcounter_dashboard .btn-group, ".o_goatcounter_dashboard .row:has(> div > .o_gc_kpi)",
+            ".o_goatcounter_dashboard h5:has-text('Latest visits')"]
+    covers: [goatcounter_stats.goatcounter_dashboard_action, goatcounter_stats.menu_goatcounter_root,
+             goatcounter_stats.menu_goatcounter_dashboard]
+
+  - name: visits
+    open: /odoo/action-goatcounter_stats.goatcounter_total_action
+    wait: .o_graph_renderer canvas
+    marks: [.o_graph_renderer canvas]
+    covers: [goatcounter_stats.goatcounter_total_action, goatcounter_stats.goatcounter_total_view_graph,
+             goatcounter_stats.goatcounter_total_view_search, goatcounter_stats.menu_goatcounter_total]
+
+  - name: pages
+    open: /odoo/action-goatcounter_stats.goatcounter_hit_page_action?view_type=list
+    wait: .o_list_table
+    marks: ["th[data-name='path']", "th[data-name='count']"]
+    covers: [goatcounter_stats.goatcounter_hit_page_action, goatcounter_stats.goatcounter_hit_view_list,
+             goatcounter_stats.goatcounter_hit_view_search, goatcounter_stats.menu_goatcounter_pages]
+
+  - name: clicks
+    open: /odoo/action-goatcounter_stats.goatcounter_hit_event_action
+    wait: .o_graph_renderer canvas
+    marks: [.o_graph_renderer canvas]
+    covers: [goatcounter_stats.goatcounter_hit_event_action, goatcounter_stats.goatcounter_hit_view_graph,
+             goatcounter_stats.menu_goatcounter_clicks]
+
+  - name: sources
+    open: /odoo/action-goatcounter_stats.goatcounter_dimension_action
+    wait: .o_pivot table
+    marks: [.o_searchview .o_facet_values, .o_pivot table]
+    covers: [goatcounter_stats.goatcounter_dimension_action, goatcounter_stats.goatcounter_dimension_view_pivot,
+             goatcounter_stats.goatcounter_dimension_view_search, goatcounter_stats.menu_goatcounter_sources]
+
+  - name: journeys
+    open: /odoo/action-goatcounter_stats.goatcounter_visit_action
+    wait: .o_list_table
+    marks: ["th[data-name='country_id']", "th[data-name='journey']"]
+    covers: [goatcounter_stats.goatcounter_visit_action, goatcounter_stats.goatcounter_visit_view_list,
+             goatcounter_stats.goatcounter_visit_view_search, goatcounter_stats.menu_goatcounter_journeys]
+
+  - name: journey_form
+    open: /odoo/action-goatcounter_stats.goatcounter_visit_action
+    wait: .o_list_table
+    steps:
+      - fill: [.o_searchview_input, Brazil]
+      - press: Enter
+      - wait: ".o_data_row:has-text('★github-link')"
+      - click: ".o_data_row:has-text('★github-link') td[name='journey']"
+      - wait: .o_form_view
+    marks: [.o_form_view .oe_title, ".o_form_view .o_field_widget[name='pageview_ids']"]
+    covers: [goatcounter_stats.goatcounter_visit_view_form]
+
+  - name: settings
+    open: /odoo/action-goatcounter_stats.goatcounter_config_action
+    wait: "#goatcounter_sync"
+    marks: ["#goatcounter_site", "#goatcounter_sync"]
+    covers: [goatcounter_stats.goatcounter_config_action, goatcounter_stats.res_config_settings_view_form,
+             goatcounter_stats.menu_goatcounter_config]
+
+skip:
+  goatcounter_stats.goatcounter_total_view_pivot: standard pivot of the daily totals shown in `visits`
+  goatcounter_stats.goatcounter_total_view_list: standard list of the daily totals shown in `visits`
+  goatcounter_stats.goatcounter_hit_view_pivot: standard pivot of the rows listed in `pages`
+  goatcounter_stats.goatcounter_dimension_view_graph: standard graph of the rows in `sources`
+  goatcounter_stats.goatcounter_dimension_view_list: standard list of the rows in `sources`
