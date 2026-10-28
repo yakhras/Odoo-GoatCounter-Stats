@@ -2,7 +2,7 @@
 <templates xml:space="preserve">
 
     <t t-name="goatcounter_stats.Delta">
-        <t t-set="pct" t-value="delta(current, previous)"/>
+        <t t-set="pct" t-value="this.delta(current, previous)"/>
         <span t-if="pct !== null" class="small ms-2"
               t-att-class="pct >= 0 ? 'text-success' : 'text-danger'"
               t-attf-title="Previous period: {{ previous }}">
@@ -19,19 +19,19 @@
                 <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
                     <h2 class="mb-0 me-auto">Website Stats</h2>
                     <div class="btn-group" role="group">
-                        <t t-foreach="periods" t-as="period" t-key="period.days">
+                        <t t-foreach="this.periods" t-as="period" t-key="period.days">
                             <button type="button" class="btn btn-sm"
-                                    t-att-class="state.days === period.days ? 'btn-primary' : 'btn-secondary'"
+                                    t-att-class="this.state.days === period.days ? 'btn-primary' : 'btn-secondary'"
                                     t-on-click="() => this.setPeriod(period.days)" t-esc="period.label"/>
                         </t>
                     </div>
-                    <button type="button" class="btn btn-sm btn-secondary" t-on-click="syncNow"
-                            t-att-disabled="state.syncing">
-                        <i class="fa fa-refresh me-1" t-att-class="{'fa-spin': state.syncing}"/>Sync now
+                    <button type="button" class="btn btn-sm btn-secondary" t-on-click="() => this.syncNow()"
+                            t-att-disabled="this.state.syncing">
+                        <i class="fa fa-refresh me-1" t-att-class="{'fa-spin': this.state.syncing}"/>Sync now
                     </button>
                 </div>
 
-                <t t-set="data" t-value="state.data"/>
+                <t t-set="data" t-value="this.state.data"/>
                 <div class="text-muted small mb-3">
                     <t t-esc="data.date_from"/> → <t t-esc="data.date_to"/>
                     (<t t-esc="data.span"/> days, compared with the <t t-esc="data.span"/> days before)
@@ -51,10 +51,7 @@
                                 <div class="text-muted small">Page views</div>
                                 <div class="fs-2 fw-bold">
                                     <t t-esc="data.kpis.pageviews"/>
-                                    <t t-call="goatcounter_stats.Delta">
-                                        <t t-set="current" t-value="data.kpis.pageviews"/>
-                                        <t t-set="previous" t-value="data.kpis.pageviews_prev"/>
-                                    </t>
+                                    <t t-call="goatcounter_stats.Delta" current="data.kpis.pageviews" previous="data.kpis.pageviews_prev"/>
                                 </div>
                             </div>
                         </div>
@@ -65,10 +62,7 @@
                                 <div class="text-muted small">Clicks</div>
                                 <div class="fs-2 fw-bold">
                                     <t t-esc="data.kpis.clicks"/>
-                                    <t t-call="goatcounter_stats.Delta">
-                                        <t t-set="current" t-value="data.kpis.clicks"/>
-                                        <t t-set="previous" t-value="data.kpis.clicks_prev"/>
-                                    </t>
+                                    <t t-call="goatcounter_stats.Delta" current="data.kpis.clicks" previous="data.kpis.clicks_prev"/>
                                 </div>
                             </div>
                         </div>
@@ -95,7 +89,7 @@
                 <div class="card mb-3">
                     <div class="card-body">
                         <h5 class="card-title">Page views and clicks per day</h5>
-                        <div class="o_gc_chart"><canvas t-ref="chart"/></div>
+                        <div class="o_gc_chart"><canvas t-ref="this.canvasRef"/></div>
                     </div>
                 </div>
 
@@ -128,11 +122,7 @@
                         <div class="card h-100">
                             <div class="card-body">
                                 <h5 class="card-title">Top pages</h5>
-                                <t t-call="goatcounter_stats.BarList">
-                                    <t t-set="rows" t-value="data.top_pages"/>
-                                    <t t-set="onRow" t-value="(row) => this.openPages(row.name)"/>
-                                    <t t-set="showTitle" t-value="true"/>
-                                </t>
+                                <t t-call="goatcounter_stats.BarList" rows="data.top_pages" onRow="(row) => this.openPages(row.name)" showTitle="true"/>
                             </div>
                         </div>
                     </div>
@@ -140,10 +130,7 @@
                         <div class="card h-100">
                             <div class="card-body">
                                 <h5 class="card-title">Clicks</h5>
-                                <t t-call="goatcounter_stats.BarList">
-                                    <t t-set="rows" t-value="data.clicks"/>
-                                    <t t-set="onRow" t-value="(row) => this.openClicks(row.name)"/>
-                                </t>
+                                <t t-call="goatcounter_stats.BarList" rows="data.clicks" onRow="(row) => this.openClicks(row.name)"/>
                             </div>
                         </div>
                     </div>
@@ -151,18 +138,14 @@
 
                 <!-- Sources -->
                 <div class="row g-3">
-                    <t t-foreach="sourceOrder" t-as="kind" t-key="kind">
+                    <t t-foreach="this.sourceOrder" t-as="kind" t-key="kind">
                         <t t-set="source" t-value="data.sources[kind]"/>
                         <div class="col-md-6 col-xl-4">
                             <div class="card h-100">
                                 <div class="card-body">
                                     <h5 class="card-title o_gc_link" t-on-click="() => this.openSource(kind)"
                                         t-esc="source.label"/>
-                                    <t t-call="goatcounter_stats.BarList">
-                                        <t t-set="rows" t-value="source.rows"/>
-                                        <t t-set="total" t-value="source.total"/>
-                                        <t t-set="onRow" t-value="(row) => this.openSource(kind, row.name)"/>
-                                    </t>
+                                    <t t-call="goatcounter_stats.BarList" rows="source.rows" total="source.total" onRow="(row) => this.openSource(kind, row.name)"/>
                                 </div>
                             </div>
                         </div>
@@ -183,10 +166,10 @@
                 </span>
                 <span class="text-nowrap fw-bold">
                     <t t-esc="row.count"/>
-                    <span t-if="total" class="text-muted fw-normal ms-1">(<t t-esc="percent(row.count, total)"/>%)</span>
+                    <span t-if="total" class="text-muted fw-normal ms-1">(<t t-esc="this.percent(row.count, total)"/>%)</span>
                 </span>
             </div>
-            <div class="o_gc_bar"><div class="o_gc_bar_fill" t-att-style="barWidth(row.count, rows)"/></div>
+            <div class="o_gc_bar"><div class="o_gc_bar_fill" t-att-style="this.barWidth(row.count, rows)"/></div>
         </div>
     </t>
 

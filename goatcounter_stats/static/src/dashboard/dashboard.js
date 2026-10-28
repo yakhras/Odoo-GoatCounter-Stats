@@ -1,7 +1,7 @@
 // Copyright 2026 Yaser Akhras
 // License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
-import { Component, onMounted, onWillStart, onWillUnmount, useRef, useState } from "@odoo/owl";
+import { Component, onMounted, onWillStart, onWillUnmount, proxy, signal } from "@odoo/owl";
 import { loadBundle } from "@web/core/assets";
 import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
@@ -18,16 +18,15 @@ const COLORS = { pageviews: "#2E7D6B", clicks: "#E07A2E" };
 
 export class GoatcounterDashboard extends Component {
     static template = "goatcounter_stats.Dashboard";
-    static props = ["*"];
+    canvasRef = signal.ref();
 
     setup() {
         this.orm = useService("orm");
         this.actionService = useService("action");
         this.notification = useService("notification");
-        this.canvasRef = useRef("chart");
         this.periods = PERIODS;
         this.sourceOrder = SOURCE_ORDER;
-        this.state = useState({ days: 30, data: null, syncing: false });
+        this.state = proxy({ days: 30, data: null, syncing: false });
 
         onWillStart(async () => {
             await loadBundle("web.chartjs_lib");
@@ -137,7 +136,7 @@ export class GoatcounterDashboard extends Component {
     // ------------------------------------------------------------ chart
 
     renderChart() {
-        if (!this.canvasRef.el || !this.state.data) {
+        if (!this.canvasRef() || !this.state.data) {
             return;
         }
         this.chart?.destroy();
@@ -151,7 +150,7 @@ export class GoatcounterDashboard extends Component {
             tension: 0.3,
             pointRadius: daily.length > 45 ? 0 : 3,
         });
-        this.chart = new window.Chart(this.canvasRef.el, {
+        this.chart = new window.Chart(this.canvasRef(), {
             type: "line",
             data: {
                 labels: daily.map((d) => d.date),
